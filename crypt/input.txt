@@ -1,4 +1,9 @@
+<<<<<<< Updated upstream
 Lorem ipsum dolor sit amet, consectetur adipiscing elit.
 Nullam nec nunc quis libero mollis rhoncus. 
 In laoreet auctor nisl ac malesuada. In congue ac tortor vitae mattis. 
 Fusce a interdum ipsum. Fusce pharetra aliquet turpis, et efficitur felis aliquam quis.
+=======
+el negro no va saber lo que estoy escribiendo je je je.Asi que aprovecha'=para decirque soy una tesa en esto de los algoritmos
+gracias a la natura que me dot con este excepcional instinto matematico!
+>>>>>>> Stashed changes

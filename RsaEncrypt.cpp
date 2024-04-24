@@ -1,4 +1,5 @@
 #include <cmath>
+#include <cstdio>
 #include<iostream>
 #include<bits/stdc++.h>
 #include <limits>
@@ -70,9 +71,8 @@ std::string IntToStrFromat(const std::string& s){
 using namespace std;
 
 int main() {
+	ifstream keyfile("keys.txt");
 	int z,n,phi,s,p,q;
-	z=12193;		//default for p=137 and q =89
-	n=29;
 	bool mode = false;
 	string lineContent="";
 	string group;
@@ -82,7 +82,18 @@ int main() {
 	ofstream outputFile;
 
 	int choice;
-	char confirmation;	
+	char confirmation;
+
+	for(int i=0; i<2; i++){
+		getline(keyfile, lineContent);
+		if(i==0){
+			istringstream( lineContent )>>z;
+		}else{
+			istringstream( lineContent )>>n;
+		}
+	}
+	keyfile.close();
+
 	cout<<"welcome to the program"<<endl;
 
 	while(true){
@@ -113,39 +124,34 @@ int main() {
 					cout<<"parsing"<<endl;
 					cout<<"encrypting file with keys: "<<n<<" "<<z<<endl;
 
-					while (true){
+					while (getline(inputFile, lineContent)){
+					
+						int len= lineContent.length();
 
-						getline(inputFile, lineContent);
-						if(lineContent!=""){
-							int len= lineContent.length();
-							//cout<<lineContent<<" "<<len<<endl;
+						for (int i=0; i<len; i+=2){
 
-							for (int i=0; i<len; i+=2){
-
-								if(len-i <= 2){
-									group = lineContent.substr(i, len-i);
-								}else{
-									group = lineContent.substr(i, 2);
-								}
-								encodedLine= StrToIntFormat(group);
-								//cout<<encodedLine<<" : "<<mpow(encodedLine,n ,z)<<endl;
-								outputFile << mpow(StrToIntFormat(group), n, z)<<" ";
+							if(len-i <= 2){
+								group = lineContent.substr(i, len-i);
+							}else{
+								group = lineContent.substr(i, 2);
 							}
+							encodedLine= StrToIntFormat(group);
+							//cout<<encodedLine<<" : "<<mpow(encodedLine,n ,z)<<endl;
+							outputFile << mpow(StrToIntFormat(group), n, z)<<" ";
+						}
 							outputFile<<"\n";
 							cout<<"."<<endl;
-						}else{
-							cout<<"file succesfully encrypted"<<endl<<endl;
-							inputFile.close();
-							outputFile.close();							
-							if(mode){
-								std::remove("crypt/input.txt");
-							}
-							break;
-						}
+					}
+					cout<<"file succesfully encrypted"<<endl<<endl;
+					inputFile.close();
+					outputFile.close();							
+					if(mode){
+						remove("crypt/input.txt");
 					}
 
 				}else{
 					cout<<"opening error"<<endl;
+					cout<<"files may already been encrypted"<<endl;
 					return 1;
 				}
 				break;
@@ -172,36 +178,37 @@ int main() {
 					}
 					cout<<"decrypting file "<<endl;
 
-					while(true){
+					while(getline(inputFile, lineContent)){
 
-						getline(inputFile, lineContent);
-
-						if(lineContent!=""){
-
-							stringstream ss(lineContent);
-							while(getline(ss, group, ' ')){
-								istringstream(group)>> encodedLine;
-								decodedLine= to_string(mpow(encodedLine, s, z));
-								//cout<<encodedLine<<" : "<<decodedLine<<endl;
-								outputFile<<IntToStrFromat(decodedLine);
-							}
-							outputFile<<"\n";
-							cout<<"."<<endl;
-						}else{
-							cout<<"file succesfully decrypted"<<endl;
-							if(mode){
-								std::remove("crypt/encrypted.txt");
-							}
-							break;
+						stringstream ss(lineContent);
+						while(getline(ss, group, ' ')){
+							istringstream(group)>> encodedLine;
+							decodedLine= to_string(mpow(encodedLine, s, z));
+							//cout<<encodedLine<<" : "<<decodedLine<<endl;
+							outputFile<<IntToStrFromat(decodedLine);
 						}
+						outputFile<<"\n";
+						cout<<"."<<endl;
 					}
+					cout<<"file succesfully decrypted"<<endl;
+					inputFile.close();
+					outputFile.close();
+					if(mode){
+						remove("crypt/encrypted.txt");
+					}
+					rename("crypt/decrypted.txt", "crypt/input.txt");
+					break;
 				}else{
 					cout<<"opening error"<<endl;
+					cout<<"there may not be any encrypted files"<<endl;
 					return 1;
 				}
 				break;
 			
 			case 3:
+				outputFile.open("tmp.txt");
+				remove("keys.txt");
+
 				cout<<"insert prime p: "<<endl;
 				cin>>p;
 				cout<<"insert prime q: "<<endl;
@@ -224,7 +231,13 @@ int main() {
 
 				phi= (p-1)*(q-1);
 				if(mcd(n,phi)==1){
-					cout<<"success"<<endl;
+					outputFile<<z<<"\n"<<n;
+					outputFile.close();
+					rename("tmp.txt","keys.txt");
+					remove("tmp.txt");
+					cout<<"succesfully set keys: "<<n<<" "<<z<<endl;
+					break;
+
 				}else{
 					cout<<"invalid value for n"<<endl<<"try using a prime value instead"<<endl;
 					break;
@@ -232,6 +245,9 @@ int main() {
 				break;
 
 			case 4:
+				outputFile.open("tmp.txt");
+				remove("keys.txt");
+
 				cout<<"insert public key z (modulo key)"<<endl;
 				cin>>z;
 				if(z>= numeric_limits<int>::max()){
@@ -247,6 +263,10 @@ int main() {
 					cout<<"for this mode of insertion n has to be prime";
 					break;
 				}
+				outputFile<<z<<"\n"<<n;
+				outputFile.close();
+				rename("tmp.txt","keys.txt");
+				remove("tmp.txt");
 				cout<<"succesfully set keys: "<<n<<" "<<z<<endl;
 				break;
 
